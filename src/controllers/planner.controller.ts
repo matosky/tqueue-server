@@ -1,27 +1,30 @@
 import Planner from "../models/planner.model";
 import { Request, Response } from "express";
-import { PlannerDocument, Slot } from "../types";
+import { PlannerDocument, Slot } from "types";
 
-export const findPlanner = async (req: Request, res: Response) => {
+export const findCurrentPlanner = async (req: Request, res: Response) => {
   try {
-    const { startDate, endDate } = req.body;
-    // Convert string dates to Date objects
-    const startDateObj = new Date(String(startDate));
-    const endDateObj = new Date(String(endDate));
+    // Find the latest planner document
+    const latestPlanner = await Planner.findOne({})
+      .sort({ _id: -1 }); // Sort by ObjectId in descending order
 
-    // Fetch planners within the specified date range
-    const planners = await Planner.find({
-      "planners.0.date": { $gte: startDateObj, $lte: endDateObj },
-    });
+    if (!latestPlanner) {
+      return res
+        .status(404)
+        .json({ error: "No planner found for the specified current day." });
+    }
 
-    res.status(200).json({ data: planners });
+    // Flatten the planners array
+    const allPlanners = latestPlanner.planners.flat();
+
+    res.status(200).json({ data: allPlanners });
   } catch (error) {
     console.error("Error fetching planner:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-export const updatePlanner = async (req: Request, res: Response) => {
+export const updateCurrentPlanner = async (req: Request, res: Response) => {
   try {
     // Destructure required parameters from the request body
     const {
@@ -42,23 +45,22 @@ export const updatePlanner = async (req: Request, res: Response) => {
         .status(404)
         .json({ error: "No planner found within the specified date range." });
     }
-    // Accessing the date property of each planner item
-    const dates = currentPlanner.planners.map((planner) => {
-      const formattedDate = new Date(planner[0].date)
-        .toISOString()
-        .split("T")[0];
-      return formattedDate;
-    });
+   // Accessing the date property of each planner item
+const dates: string[] = currentPlanner.planners.map((planner: Array<{ date: Date; slots: Slot[] }>) => {
+    const formattedDate = new Date(planner[0].date)
+      .toISOString()
+      .split("T")[0];
+    return formattedDate;
+  });
+  
 
     // Find a date that matches the given currentDay
     const matchingDate = dates.find((date) => date === currentDay);
 
     if (!matchingDate) {
-      return res
-        .status(404)
-        .json({
-          error: "No matching date found for the specified currentDay.",
-        });
+      return res.status(404).json({
+        error: "No matching date found for the specified currentDay.",
+      });
     }
 
     // Get the index of the matching date

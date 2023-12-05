@@ -1,20 +1,23 @@
-//  export interface Delivery {
-//     customerID: string;
-//     pickUpLocation: string;
-//     dropOffLocation: string;
-//   }
-//   export interface Slot {
-//     slotNumber: number;
-//     deliveries: Delivery[];
-//   }
+import { Document } from "mongoose";
+
+export interface PlannerDocument extends Document {
+    _id: string;
+    planners: Array<Array<{ date: Date; slots: Slot[] }>>;
+  }
   
-//   export interface Planner {
-//     date: string;
-//     slots: Slot[];
-//   }
+  export interface Slot {
+    slotNumber: number;
+    deliveries: Array<Delivery>;
+  }
   
-//   // Main interface for the JSON structure
-//   export interface PlannerDocument {
-//     [index: number]: Planner[];
-//   }
+  export interface Delivery {
+    customerID: string;
+    customerName: string;
+  }
   
+  // Define an interface for the slot object
+  export interface SlotUpdate {
+    date: Date;
+    slotNumber: number;
+    customerDelivery: Delivery; // Replace 'any' with the actual type of your customerDelivery
+  }

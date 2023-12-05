@@ -12,27 +12,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePlanner = exports.findPlanner = void 0;
+exports.updateCurrentPlanner = exports.findCurrentPlanner = void 0;
 const planner_model_1 = __importDefault(require("../models/planner.model"));
-const findPlanner = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const findCurrentPlanner = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { startDate, endDate } = req.body;
-        // Convert string dates to Date objects
-        const startDateObj = new Date(String(startDate));
-        const endDateObj = new Date(String(endDate));
-        // Fetch planners within the specified date range
-        const planners = yield planner_model_1.default.find({
-            "planners.0.date": { $gte: startDateObj, $lte: endDateObj },
-        });
-        res.status(200).json({ data: planners });
+        // Find the latest planner document
+        const latestPlanner = yield planner_model_1.default.findOne({})
+            .sort({ _id: -1 }); // Sort by ObjectId in descending order
+        if (!latestPlanner) {
+            return res
+                .status(404)
+                .json({ error: "No planner found for the specified current day." });
+        }
+        // Flatten the planners array
+        const allPlanners = latestPlanner.planners.flat();
+        res.status(200).json({ data: allPlanners });
     }
     catch (error) {
         console.error("Error fetching planner:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-exports.findPlanner = findPlanner;
-const updatePlanner = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.findCurrentPlanner = findCurrentPlanner;
+const updateCurrentPlanner = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Destructure required parameters from the request body
         const { startDate, endDate, slotNumberOfCurrentDay, customerDelivery, currentDay, } = req.body;
@@ -55,9 +57,7 @@ const updatePlanner = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // Find a date that matches the given currentDay
         const matchingDate = dates.find((date) => date === currentDay);
         if (!matchingDate) {
-            return res
-                .status(404)
-                .json({
+            return res.status(404).json({
                 error: "No matching date found for the specified currentDay.",
             });
         }
@@ -96,4 +96,4 @@ const updatePlanner = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-exports.updatePlanner = updatePlanner;
+exports.updateCurrentPlanner = updateCurrentPlanner;

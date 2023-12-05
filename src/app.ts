@@ -1,4 +1,4 @@
-import express from "express";
+import express, {Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { connectToDb } from "./config/config";
 import userRouter from "./routes/user.route";
@@ -11,11 +11,7 @@ import plannerRouter from "./routes/planner.route";
 dotenv.config();
 const app = express();
 
-var corsOptions = {
-  origin: "*",
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 
 // Schedule the cron job for periodic updates

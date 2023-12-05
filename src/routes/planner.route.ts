@@ -1,15 +1,15 @@
 import express from "express";
 import Planner from "../models/planner.model";
-import { findPlanner, updatePlanner } from "../controllers/planner.controller";
+import { findCurrentPlanner, updateCurrentPlanner } from "../controllers/planner.controller";
 
 const router = express.Router();
 
 
 
 // Endpoint to fetch a planner with a date range from the request body
-router.get("/", findPlanner);
+router.get("/current-planner", findCurrentPlanner);
 // Endpoint to update planner
-router.put("/", updatePlanner);
+router.put("/current-planner", updateCurrentPlanner);
 
 
 
@@ -37,176 +37,40 @@ router.put("/", updatePlanner);
 // WARNING: This is no longer to be used
 router.post('/', async (req, res) => {
   try {
+    const currentDate = new Date();
+    const plannerEntries = [];
+
+    for (let i = 0; i < 7; i++) {
+      const plannerDate = new Date();
+      plannerDate.setDate(currentDate.getDate() + i);
+
+      const plannerEntry = {
+        date: plannerDate,
+        slots: [
+          {
+            slotNumber: 1,
+            deliveries: [],
+          },
+          {
+            slotNumber: 2,
+            deliveries: [],
+          },
+          {
+            slotNumber: 3,
+            deliveries: [],
+          },
+          {
+            slotNumber: 4,
+            deliveries: [],
+          },
+        ],
+      };
+
+      plannerEntries.push([plannerEntry]);
+    }
+
     const newPlanner = new Planner({
-      planners: [
-        [
-          {
-            date: new Date('2023-01-01'),
-            slots: [
-              {
-                slotNumber: 1,
-                deliveries: [
-                 
-                ],
-              },
-              {
-                slotNumber: 2,
-                deliveries: [
-                 
-                ],
-              },
-              {
-                slotNumber: 3,
-                deliveries: [
-                  
-                ],
-              },
-              {
-                slotNumber: 4,
-                deliveries: [],
-              },
-            ],
-          },
-        ],
-        [
-          {
-            date: new Date('2023-01-02'),
-            slots: [
-              {
-                slotNumber: 1,
-                deliveries: [],
-              },
-              {
-                slotNumber: 2,
-                deliveries: [],
-              },
-              {
-                slotNumber: 3,
-                deliveries: [],
-              },
-              {
-                slotNumber: 4,
-                deliveries: [],
-              },
-            ],
-          },
-        ],
-        [
-          {
-            date: new Date('2023-01-03'),
-            slots: [
-              {
-                slotNumber: 1,
-                deliveries: [],
-              },
-              {
-                slotNumber: 2,
-                deliveries: [],
-              },
-              {
-                slotNumber: 3,
-                deliveries: [],
-              },
-              {
-                slotNumber: 4,
-                deliveries: [],
-              },
-            ],
-          },
-        ],
-        [
-          {
-            date: new Date('2023-01-04'),
-            slots: [
-              {
-                slotNumber: 1,
-                deliveries: [],
-              },
-              {
-                slotNumber: 2,
-                deliveries: [],
-              },
-              {
-                slotNumber: 3,
-                deliveries: [],
-              },
-              {
-                slotNumber: 4,
-                deliveries: [],
-              },
-            ],
-          },
-        ],
-        [
-          {
-            date: new Date('2023-01-05'),
-            slots: [
-              {
-                slotNumber: 1,
-                deliveries: [],
-              },
-              {
-                slotNumber: 2,
-                deliveries: [],
-              },
-              {
-                slotNumber: 3,
-                deliveries: [],
-              },
-              {
-                slotNumber: 4,
-                deliveries: [],
-              },
-            ],
-          },
-        ],
-        [
-          {
-            date: new Date('2023-01-06'),
-            slots: [
-              {
-                slotNumber: 1,
-                deliveries: [],
-              },
-              {
-                slotNumber: 2,
-                deliveries: [],
-              },
-              {
-                slotNumber: 3,
-                deliveries: [],
-              },
-              {
-                slotNumber: 4,
-                deliveries: [],
-              },
-            ],
-          },
-        ],
-        [
-          {
-            date: new Date('2023-01-07'),
-            slots: [
-              {
-                slotNumber: 1,
-                deliveries: [],
-              },
-              {
-                slotNumber: 2,
-                deliveries: [],
-              },
-              {
-                slotNumber: 3,
-                deliveries: [],
-              },
-              {
-                slotNumber: 4,
-                deliveries: [],
-              },
-            ],
-          },
-        ],
-      ],
+      planners: plannerEntries,
     });
 
     // Save the new planner document to the database
@@ -218,5 +82,6 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 export default router;

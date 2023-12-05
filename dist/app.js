@@ -23,10 +23,7 @@ const node_cron_1 = __importDefault(require("node-cron"));
 const planner_route_1 = __importDefault(require("./routes/planner.route"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-var corsOptions = {
-    origin: "*",
-};
-app.use((0, cors_1.default)(corsOptions));
+app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 // Schedule the cron job for periodic updates
 node_cron_1.default.schedule("0 0 */7 * *", auto_generate_planner_1.autoGeneratePlanner);
