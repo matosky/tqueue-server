@@ -18,12 +18,11 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const mongoose_2 = require("mongoose");
 dotenv_1.default.config();
 const port = process.env.MONGO_PORT;
-const host = process.env.MONGO_HOST;
 const dbName = process.env.DB_NAME;
 const connectToDb = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Attempt to connect to MongoDB
-        yield mongoose_1.default.connect(`mongodb://${host}:${port}/${dbName}`);
+        yield mongoose_1.default.connect(`mongodb://localhost:${port}/${dbName}`);
         console.log("Connected to MongoDB");
     }
     catch (error) {

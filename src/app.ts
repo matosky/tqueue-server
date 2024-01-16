@@ -7,6 +7,9 @@ import dotenv from "dotenv";
 import { autoGeneratePlanner } from "./utils/auto-generate-planner";
 import cron from "node-cron";
 import plannerRouter from "./routes/planner.route";
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+
 
 dotenv.config();
 const app = express();

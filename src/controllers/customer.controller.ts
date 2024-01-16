@@ -7,8 +7,7 @@ export const customerController = async (
   res: Response,
   next: NextFunction
 ) => {
-
-    console.log(req.body)
+  console.log(req.body)
   try {
     const { firstName, lastName, email } = req.body;
     const customer = new Customer({
